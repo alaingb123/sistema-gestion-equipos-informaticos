@@ -1,0 +1,33 @@
+/* Estilos para los filtros dropdown */
+.admin-filter-select {
+    min-width: 200px;
+    max-width: 100%;
+    width: 100%;
+}
+
+.admin-filter-select select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.admin-filter {
+    margin-bottom: 15px;
+}
+
+.admin-filter h3 {
+    margin: 0;
+    padding: 8px;
+    font-size: 11px;
+    text-align: left;
+    background: #79aec8;
+    color: #fff;
+}
+
+.admin-filter select {
+    background: white;
+} 

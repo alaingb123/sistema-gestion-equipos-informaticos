@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="dropdown-filter" style="padding: 0 15px;">
+    <h3>{% blocktrans with filter_title=title %}Por {{ filter_title }}{% endblocktrans %}</h3>
+    <select style="width: 95%; padding: 5px; margin: 5px 0;" 
+            onchange="window.location.search = this.value;">
+        <option value="">---------</option>
+        {% for choice in choices %}
+            <option value="{{ choice.query_string }}"
+                    {% if choice.selected %} selected="selected"{% endif %}>
+                {{ choice.display }}
+            </option>
+        {% endfor %}
+    </select>
+</div> 

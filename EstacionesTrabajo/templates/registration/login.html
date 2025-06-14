@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inicio de Sesión</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="{% static 'images/citma_logo.png' %}" alt="CITMA Logo">
+        </div>
+        <div class="form-container">
+            <h2>Equipos Informáticos</h2>
+            <h3>Inicio de Sesión</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="styled-form">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+   /* login.css */
+body {
+    background-color: #ffffff; /* Fondo blanco */
+    font-family: Arial, sans-serif;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-container img {
+    width: 120px; /* Tamaño del logo */
+}
+
+.form-container {
+    background-color: #f8f9fa; /* Fondo del formulario */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para estilo */
+}
+
+.form-container h2 {
+    text-align: center;
+    color: #003399;
+    margin-bottom: 10px;
+    font-size: 22px;
+    text-transform: uppercase;
+}
+
+.form-container h3 {
+    text-align: center;
+    color: #666666;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.styled-form p {
+    margin-bottom: 15px;
+}
+
+.styled-form input[type="text"],
+.styled-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.form-container form button {
+    background-color: #003399;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.form-container form button:hover {
+    background-color: #002266;
+}
+</style>

@@ -1,0 +1,85 @@
+.text {
+    white-space: normal;
+    word-wrap: break-word; /* Para que las palabras largas también se dividan si es necesario */
+}
+
+/* Estilos para todas las columnas en PCAdmin - solo en la vista de lista */
+#changelist .field-get_area_display,
+#changelist .field-responsable,
+#changelist .field-get_numero_inventario,
+#changelist .field-get_estado,
+#changelist .field-get_proyecto_internacional,
+#changelist .field-sistema_operativo,
+#changelist .field-procesador,
+#changelist .field-ram,
+#changelist .field-disco_duro,
+#changelist .field-get_monitor,
+#changelist .field-get_teclado,
+#changelist .field-get_mouse,
+#changelist .field-get_impresora,
+#changelist .field-get_scaner,
+#changelist .field-get_ups {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 200px !important;
+}
+
+/* Estilos para todas las columnas en DispositivoAdmin (periféricos) - solo en la vista de lista */
+#changelist .field-get_area,
+#changelist .field-get_responsable,
+#changelist .field-get_numero_inventario,
+#changelist .field-get_pc,
+#changelist .field-get_estado,
+#changelist .field-get_proyecto_internacional,
+#changelist .field-marca {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 200px !important;
+}
+
+/* Para mostrar el texto completo al pasar el mouse en todas las columnas - solo en la vista de lista */
+#changelist .field-get_area_display span,
+#changelist .field-responsable span,
+#changelist .field-get_numero_inventario span,
+#changelist .field-get_estado span,
+#changelist .field-get_proyecto_internacional span,
+#changelist .field-sistema_operativo span,
+#changelist .field-procesador span,
+#changelist .field-ram span,
+#changelist .field-disco_duro span,
+#changelist .field-get_monitor span,
+#changelist .field-get_teclado span,
+#changelist .field-get_mouse span,
+#changelist .field-get_impresora span,
+#changelist .field-get_scaner span,
+#changelist .field-get_ups span,
+#changelist .field-get_area span,
+#changelist .field-get_responsable span,
+#changelist .field-get_pc span,
+#changelist .field-marca span {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ajustes específicos para algunas columnas que podrían necesitar más o menos espacio - solo en la vista de lista */
+#changelist .field-get_estado,
+#changelist .field-get_proyecto_internacional {
+    max-width: 100px !important; /* Columnas más estrechas para estados y proyectos */
+}
+
+#changelist .field-responsable,
+#changelist .field-get_responsable {
+    max-width: 250px !important; /* Más espacio para nombres de responsables */
+}
+
+#changelist .field-sistema_operativo,
+#changelist .field-procesador {
+    max-width: 300px !important; /* Más espacio para información técnica */
+}
+
+
+

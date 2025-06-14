@@ -1,0 +1,234 @@
+# Guía de Despliegue en Producción - Sistema de Gestión de Equipos Informáticos
+
+## Requisitos Previos
+1. Actualizar el sistema:
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+2. Instalar Python y herramientas necesarias:
+```bash
+sudo apt install python3 python3-pip python3-venv nginx git -y
+```
+
+## Configuración del Proyecto
+
+1. Copiar el proyecto (si aplica):
+
+
+2. Crear y activar entorno virtual:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # En Linux/Mac
+# O en Windows:
+# .\venv\Scripts\activate
+```
+
+Nota: El prompt cambiará para indicar que el entorno virtual está activo:
+- Activado: (venv) usuario@servidor:~/EquiposInformaticos$
+- Desactivado: usuario@servidor:~/EquiposInformaticos$
+
+3. Instalar dependencias del proyecto:
+```bash
+pip install -r requirements.txt
+pip install gunicorn  # Necesario para producción
+```
+
+4. Configurar variables de entorno (no es necesario):
+```bash
+cp .env.example .env
+# Editar .env con los valores correctos
+nano .env
+```
+
+5. Configurar la base de datos en EquiposInformaticos/settings.py
+   (La configuración actual ya está correcta,si da problema quizas haya que crear la base de datos manual)
+
+6. Configuraciones importantes en settings.py para producción:
+
+   a) Configurar ALLOWED_HOSTS:
+   ```python
+   # Añadir SOLO la IP de la máquina virtual donde se ejecutará Django
+   # Por ejemplo, si la máquina virtual tiene IP 192.168.1.100:
+   ALLOWED_HOSTS = ['192.168.1.100']
+   ```
+   Nota: No es necesario incluir 'localhost' o '127.0.0.1' en producción, solo la IP real del servidor.
+
+   b) Configurar DEBUG (listo):
+   ```python
+   # En producción, DEBUG SIEMPRE debe estar en False
+   DEBUG = False
+   ```
+
+   c) Configurar STATIC_ROOT (listo):
+   ```python
+   # Asegurarse que STATIC_ROOT está configurado correctamente
+   STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+   ```
+
+   d) Configurar CSRF_TRUSTED_ORIGINS (si es necesario):
+   ```python
+   # Si accedes a través de HTTPS o un dominio específico
+   CSRF_TRUSTED_ORIGINS = ['https://tu-dominio.com', 'http://192.168.1.100']
+   ```
+
+   e) Configurar SECURE_SSL_REDIRECT (si usas HTTPS):
+   ```python
+   # Solo si tienes configurado SSL/HTTPS
+   SECURE_SSL_REDIRECT = True
+   ```
+
+   Nota: Estas configuraciones son críticas para la seguridad y funcionamiento del sitio en producción.
+   - DEBUG = False evita mostrar información sensible en caso de errores
+   - ALLOWED_HOSTS con la IP correcta permite las conexiones al servidor
+   - STATIC_ROOT es necesario para que Nginx sirva los archivos estáticos
+   - CSRF_TRUSTED_ORIGINS es necesario si usas dominios específicos
+   - SECURE_SSL_REDIRECT solo si tienes configurado HTTPS
+
+7. Aplicar migraciones:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+8. Crear superusuario:
+```bash
+python manage.py createsuperuser
+```
+
+9. Recolectar archivos estáticos:
+```bash
+python manage.py collectstatic --no-input
+```
+
+10. Importar datos iniciales:
+```bash
+python manage.py importar_todo
+```
+
+## Configuración de Gunicorn
+
+1. Instalar Gunicorn (si no se instaló en el paso 3):
+```bash
+pip install gunicorn
+```
+
+2. Crear archivo de servicio systemd:
+```bash
+sudo nano /etc/systemd/system/equiposinformaticos.service
+```
+
+Contenido del archivo:
+```ini
+[Unit]
+Description=Equipos Informaticos Gunicorn Daemon
+After=network.target
+
+[Service]
+User=<usuario>
+Group=www-data
+WorkingDirectory=/ruta/a/EquiposInformaticos
+ExecStart=/ruta/a/EquiposInformaticos/venv/bin/gunicorn \
+    --access-logfile - \
+    --workers 3 \
+    --bind unix:/run/equiposinformaticos.sock \
+    EquiposInformaticos.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+```
+
+3. Activar y iniciar el servicio:
+```bash
+sudo systemctl start equiposinformaticos
+sudo systemctl enable equiposinformaticos
+```
+
+## Configuración de Nginx
+
+1. Crear configuración de Nginx:
+```bash
+sudo nano /etc/nginx/sites-available/equiposinformaticos
+```
+
+Contenido del archivo:
+```nginx
+server {
+    listen 80;
+    server_name tu_dominio_o_ip;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    
+    location /static/ {
+        root /ruta/a/EquiposInformaticos;
+    }
+
+    location /media/ {
+        root /ruta/a/EquiposInformaticos;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/equiposinformaticos.sock;
+    }
+}
+```
+
+2. Habilitar el sitio:
+```bash
+sudo ln -s /etc/nginx/sites-available/equiposinformaticos /etc/nginx/sites-enabled/
+sudo nginx -t  # Verificar configuración
+sudo systemctl restart nginx
+```
+
+## Verificación y Pruebas
+
+1. Verificar estado de los servicios:
+```bash
+sudo systemctl status equiposinformaticos
+sudo systemctl status nginx
+```
+
+2. Revisar logs si hay errores:
+```bash
+sudo journalctl -u equiposinformaticos
+sudo tail -f /var/log/nginx/error.log
+```
+
+## Mantenimiento
+
+- Para reiniciar servicios después de cambios:
+```bash
+sudo systemctl restart equiposinformaticos
+sudo systemctl restart nginx
+```
+
+
+## Solución de Problemas Comunes
+
+1. Si hay problemas de permisos:
+```bash
+sudo chown -R <usuario>:www-data /ruta/a/EquiposInformaticos
+sudo chmod -R 755 /ruta/a/EquiposInformaticos
+```
+
+2. Si los archivos estáticos no cargan:
+- Verificar la ruta en settings.py (STATIC_ROOT)
+- Ejecutar collectstatic nuevamente
+- Verificar permisos de la carpeta static
+
+3. Si el servidor no responde:
+- Verificar logs de Gunicorn y Nginx
+- Comprobar que los sockets están creados
+- Verificar que los puertos están abiertos
+
+4. Problemas comunes con la base de datos:
+- Verificar que el servicio de la base de datos está corriendo
+- Comprobar credenciales en settings.py
+- Verificar permisos del usuario de la base de datos
+
+5. Si hay problemas con el entorno virtual:
+- Verificar que está activado (debe verse el prefijo (venv))
+- Reinstalar dependencias si es necesario
+- Comprobar la versión de Python 
